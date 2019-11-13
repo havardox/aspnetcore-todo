@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AspNetCoreTodo.Models;
 using AspNetCoreTodo.Services;
@@ -12,21 +9,39 @@ namespace AspNetCoreTodo.Controllers
     {
         private readonly ITodoItemService _todoItemService;
 
-        public TodoController(ITodoItemService todoItemService)
+        public TodoController(
+            ITodoItemService todoItemService)
         {
             _todoItemService = todoItemService;
         }
 
-        public async Task<IActionResult> Index() 
+        public async Task<IActionResult> Index()
         {
-            var items = await _todoItemService.GetIncompleteItemAsync();
+            var todoItems = await _todoItemService.GetIncompleteItemsAsync();
 
-            var model = new TodoViewModel() 
+            var model = new TodoViewModel()
             {
-                Items = items
+                Items = todoItems
             };
 
             return View(model);
+        }
+
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddItem(TodoItem newItem)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var successful = await _todoItemService.AddItemAsync(newItem);
+            if (!successful)
+            {
+                return BadRequest("Could not add item.");
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }
