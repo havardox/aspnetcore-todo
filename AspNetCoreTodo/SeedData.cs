@@ -22,8 +22,8 @@ namespace AspNetCoreTodo
             await EnsureTestAdminAsync(userManager);
         }
 
-        public static async Task EnsureRolesAsync(
-            RoleManager<IdentityUser> roleManager)
+        private static async Task EnsureRolesAsync(
+            RoleManager<IdentityRole> roleManager)
         {
             var alreadyExists = await roleManager
                 .RoleExistsAsync(Constants.AdministratorRole);
